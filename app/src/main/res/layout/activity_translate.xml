@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.viktor.yandextranslate.TranslateActivity">
+
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="346dp"
+            android:layout_height="168dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="80dp"
+            android:ems="10"
+            android:inputType="textMultiLine"
+            android:textColorLink="@color/colorPrimary"
+            tools:ignore="LabelFor,RtlHardcoded" />
+
+        <Spinner
+            android:id="@+id/spinnerLeft"
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="5dp"
+            tools:ignore="RtlHardcoded" />
+
+        <Spinner
+            android:id="@+id/spinnerRight"
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="213dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="5dp"
+            tools:ignore="RtlHardcoded" />
+
+        <Button
+            android:id="@+id/buttonSwapLng"
+            android:layout_width="58dp"
+            android:layout_height="55dp"
+            android:layout_marginLeft="152dp"
+            android:layout_marginTop="8dp"
+            android:text="swap"
+            android:textSize="18sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+
+    </FrameLayout>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/navigation" />
+
+</LinearLayout>
