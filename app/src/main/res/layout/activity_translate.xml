@@ -21,9 +21,12 @@
             android:layout_marginLeft="7dp"
             android:layout_marginTop="80dp"
             android:ems="10"
-            android:inputType="textMultiLine"
+            android:windowSoftInputMode="stateVisible"
+            android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
             android:textColorLink="@color/colorPrimary"
-            tools:ignore="LabelFor,RtlHardcoded" />
+            android:imeOptions="actionSend"
+            tools:ignore="LabelFor,RtlHardcoded"
+            />
 
         <Spinner
             android:id="@+id/spinnerLeft"
@@ -31,6 +34,7 @@
             android:layout_height="60dp"
             android:layout_marginLeft="7dp"
             android:layout_marginTop="5dp"
+            android:visibility="invisible"
             tools:ignore="RtlHardcoded" />
 
         <Spinner
@@ -40,6 +44,7 @@
             android:layout_marginLeft="213dp"
             android:layout_marginRight="7dp"
             android:layout_marginTop="5dp"
+            android:visibility="invisible"
             tools:ignore="RtlHardcoded" />
 
         <Button
@@ -50,6 +55,7 @@
             android:layout_marginTop="8dp"
             android:text="swap"
             android:textSize="18sp"
+            android:visibility="invisible"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
 
