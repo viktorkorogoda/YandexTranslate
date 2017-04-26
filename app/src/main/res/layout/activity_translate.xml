@@ -34,7 +34,6 @@
             android:layout_height="60dp"
             android:layout_marginLeft="7dp"
             android:layout_marginTop="5dp"
-            android:visibility="invisible"
             tools:ignore="RtlHardcoded" />
 
         <Spinner
@@ -44,7 +43,6 @@
             android:layout_marginLeft="213dp"
             android:layout_marginRight="7dp"
             android:layout_marginTop="5dp"
-            android:visibility="invisible"
             tools:ignore="RtlHardcoded" />
 
         <Button
@@ -55,8 +53,23 @@
             android:layout_marginTop="8dp"
             android:text="swap"
             android:textSize="18sp"
-            android:visibility="invisible"
             tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/buttonTranslate"
+            android:layout_width="346dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="252dp"
+            android:text="Перевести" />
+
+        <TextView
+            android:id="@+id/translatedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="320dp"
+            android:text="TextView" />
 
 
     </FrameLayout>
