@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,24 +21,22 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.example.viktor.yandextranslate.models.LanguageDirection;
-import com.example.viktor.yandextranslate.models.LanguageItem;
 import com.example.viktor.yandextranslate.models.Languages;
 import com.example.viktor.yandextranslate.models.TranslateResponse;
 import com.example.viktor.yandextranslate.nettwork.CustomJSONObjectRequest;
 import com.example.viktor.yandextranslate.nettwork.CustomVolleyRequestQueue;
+import com.example.viktor.yandextranslate.utils.EditTextWatcher;
 import com.example.viktor.yandextranslate.utils.Utils;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class TranslateActivity extends AppCompatActivity implements Response.Listener, Response.ErrorListener {
-//    private final String url = "https://translate.yandex.net/api/v1.5/tr.json";
-
-
     private EditText editText;
     private boolean userIsInteracting;
     private boolean visibleSpinner = false;
@@ -90,8 +90,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         buttonTranslate = (Button) findViewById(R.id.buttonTranslate);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        editText.setOnKeyListener(onKeyListener);
-        editText.setOnLongClickListener(onLongClickListener);
+//        editText.setOnKeyListener(onKeyListener);
         translatedText = (TextView) findViewById(R.id.translatedText);
 
         spinnerLeft.setOnItemSelectedListener(selectLeft);
@@ -99,13 +98,15 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         buttonTranslate.setOnClickListener(onClickListener);
         buttonSwapLng.setOnClickListener(onClickListenerSwapLng);
         getLanguages(defaultLng);
+        editText.addTextChangedListener(new EditTextWatcher(spinnerLeft,spinnerRight,buttonSwapLng,editText));
     }
 
     private EditText.OnKeyListener onKeyListener = new EditText.OnKeyListener() {
 
         @Override
         public boolean onKey(View v, int keyCode, KeyEvent event) {
-            if (event.getAction() == KeyEvent.ACTION_UP) {
+
+            if (event.getAction() == KeyEvent.FLAG_SOFT_KEYBOARD) {
 
                 if (editText.getText().length() != 0) {
                     if (!visibleSpinner) {
@@ -125,6 +126,13 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
             return false;
         }
     };
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        String str = "";
+        str = "123123";
+        return super.dispatchKeyEvent(event);
+    }
 
 
     private Button.OnClickListener onClickListener = new Button.OnClickListener() {
@@ -150,28 +158,6 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
             spinnerLeft.setSelection(languageDirection.getLngFromInd());
             spinnerRight.setSelection(languageDirection.getLngToInd());
-        }
-    };
-    private EditText.OnLongClickListener onLongClickListener = new EditText.OnLongClickListener() {
-
-        @Override
-        public boolean onLongClick(View v) {
-            return true;
-//            if (((EditText) v.findViewById(R.id.editText)).getText().length() != 0) {
-//                if (!visibleSpinner) {
-//                    spinnerLeft.setVisibility(View.VISIBLE);
-//                    spinnerRight.setVisibility(View.VISIBLE);
-//                    buttonSwapLng.setVisibility(View.VISIBLE);
-//                    visibleSpinner = true;
-//                    return true;
-//                }
-//            } else {
-//                visibleSpinner = false;
-//                spinnerLeft.setVisibility(View.INVISIBLE);
-//                spinnerRight.setVisibility(View.INVISIBLE);
-//                buttonSwapLng.setVisibility(View.INVISIBLE);
-//            }
-//            return false;
         }
     };
 
