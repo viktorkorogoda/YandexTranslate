@@ -6,7 +6,6 @@ import java.util.HashMap;
 /**
  * Created by Viktor on 25.04.2017.
  */
-
 public class Languages {
     private ArrayList<String> dirs;
     private HashMap<String, String> langs;

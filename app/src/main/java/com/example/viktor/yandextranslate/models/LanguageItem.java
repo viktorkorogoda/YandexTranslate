@@ -1,5 +1,6 @@
 package com.example.viktor.yandextranslate.models;
 
+
 /**
  * Created by Viktor on 26.04.2017.
  */

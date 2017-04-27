@@ -14,13 +14,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.viktor.yandextranslate.models.LanguageDirection;
 import com.example.viktor.yandextranslate.models.LanguageItem;
 import com.example.viktor.yandextranslate.models.Languages;
+import com.example.viktor.yandextranslate.models.TranslateResponse;
 import com.example.viktor.yandextranslate.nettwork.CustomJSONObjectRequest;
 import com.example.viktor.yandextranslate.nettwork.CustomVolleyRequestQueue;
 import com.example.viktor.yandextranslate.utils.Utils;
@@ -29,19 +30,12 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 
 public class TranslateActivity extends AppCompatActivity implements Response.Listener, Response.ErrorListener {
 //    private final String url = "https://translate.yandex.net/api/v1.5/tr.json";
 
-    private TextView mTextMessage;
 
     private EditText editText;
     private boolean userIsInteracting;
@@ -51,7 +45,6 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     private RequestQueue mQueue;
 
-    private String spinnerName = "";
     private boolean parseLng = false;
     private boolean translate = false;
 
@@ -60,13 +53,12 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private Button buttonSwapLng;
     private Button buttonTranslate;
     public static final String REQUEST_TAG = "TranslateActivity";
+
+    private LanguageDirection languageDirection;
     private String lngFrom = "";
     private String lngTo = "";
     private HashMap<Integer, HashMap<String, String>> lngCollections;
     private TextView translatedText;
-
-    private ArrayList<LanguageItem> leftSpinnerItems;
-    private ArrayList<LanguageItem> rightSpinnerItems;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -75,22 +67,20 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_translate:
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_bookmark:
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_settings:
                     return true;
             }
             return false;
         }
-
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        leftSpinnerItems = new ArrayList<>();
-        rightSpinnerItems = new ArrayList<>();
+        languageDirection = new LanguageDirection();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translate);
         editText = (EditText) findViewById(R.id.editText);
@@ -107,6 +97,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         spinnerLeft.setOnItemSelectedListener(selectLeft);
         spinnerRight.setOnItemSelectedListener(selectRight);
         buttonTranslate.setOnClickListener(onClickListener);
+        buttonSwapLng.setOnClickListener(onClickListenerSwapLng);
         getLanguages(defaultLng);
     }
 
@@ -136,13 +127,29 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     };
 
 
-
-    private Button.OnClickListener onClickListener = new Button.OnClickListener(){
+    private Button.OnClickListener onClickListener = new Button.OnClickListener() {
 
         @Override
         public void onClick(View v) {
             sendToTranslate(editText.getText().toString(), lngFrom + "-" + lngTo);
             translate = true;
+        }
+    };
+
+    private Button.OnClickListener onClickListenerSwapLng = new Button.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            String lngFrom = languageDirection.getLngFrom();
+            int lngFromInd = languageDirection.getLngFromInd();
+
+            languageDirection.setLngFrom(languageDirection.getLngTo());
+            languageDirection.setLngFromInd(languageDirection.getLngToInd());
+            languageDirection.setLngTo(lngFrom);
+            languageDirection.setLngToInd(lngFromInd);
+
+            spinnerLeft.setSelection(languageDirection.getLngFromInd());
+            spinnerRight.setSelection(languageDirection.getLngToInd());
         }
     };
     private EditText.OnLongClickListener onLongClickListener = new EditText.OnLongClickListener() {
@@ -174,9 +181,13 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (userIsInteracting) {
                 lngFrom = lngCollections.get(position).keySet().iterator().next();
+
+                languageDirection.setLngFrom(lngCollections.get(position).keySet().iterator().next());
+                languageDirection.setLngFromInd(position);
                 userIsInteracting = false;
             }
-            if(lngFrom.length() == 0) lngFrom = lngCollections.get(position).keySet().iterator().next();
+            if (lngFrom.length() == 0)
+                lngFrom = lngCollections.get(position).keySet().iterator().next();
         }
 
         @Override
@@ -191,9 +202,12 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (userIsInteracting) {
                 lngTo = lngCollections.get(position).keySet().iterator().next();
+                languageDirection.setLngTo(lngCollections.get(position).keySet().iterator().next());
+                languageDirection.setLngToInd(position);
                 userIsInteracting = false;
             }
-            if(lngTo.length() == 0) lngTo = lngCollections.get(position).keySet().iterator().next();
+            if (lngTo.length() == 0)
+                lngTo = lngCollections.get(position).keySet().iterator().next();
         }
 
         @Override
@@ -223,7 +237,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         }
     }
 
-    private void sendToTranslate(String text, String lang){
+    private void sendToTranslate(String text, String lang) {
         translate = true;
         String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
         String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + text + "&lang=" + lang + "&key=" + key;
@@ -264,10 +278,8 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         HashMap<String, String> lanuagesMap = Utils.sortByValue(languages.getLangs());
         addToLangueageCollections(lanuagesMap);
 
-        if (spinnerName.length() == 0) {
-            fillSpinner(spinnerLeft, lanuagesMap);
-            fillSpinner(spinnerRight, lanuagesMap);
-        }
+        fillSpinner(spinnerLeft, lanuagesMap);
+        fillSpinner(spinnerRight, lanuagesMap);
         /*else {
             switch (spinnerName) {
                 case "spinnerRight": {
@@ -282,10 +294,13 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         }*/
     }
 
-    private void showTranslatedText(String text){
-        this.translatedText.setText(text);
-    }
+    private void showTranslatedText(String text) {
 
+        Gson gson = new Gson();
+        TranslateResponse response = gson.fromJson(text, TranslateResponse.class);
+
+        this.translatedText.setText(response.getText().get(0));
+    }
 
 
     @Override
@@ -296,11 +311,11 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     @Override
     public void onResponse(Object response) {
-        if(parseLng) {
+        if (parseLng) {
             parseLanguages(response.toString());
             parseLng = false;
         }
-        if(translate){
+        if (translate) {
             showTranslatedText(response.toString());
             translate = false;
         }

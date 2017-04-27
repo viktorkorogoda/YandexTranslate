@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Yandex Translate</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_translate"></string>
+    <string name="title_bookmarks"></string>
+    <string name="title_settings"></string>
 </resources>

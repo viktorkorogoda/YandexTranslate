@@ -52,7 +52,7 @@
             android:layout_marginLeft="152dp"
             android:layout_marginTop="8dp"
             android:text="swap"
-            android:textSize="18sp"
+            android:textSize="12sp"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
         <Button
@@ -61,15 +61,18 @@
             android:layout_height="40dp"
             android:layout_marginLeft="7dp"
             android:layout_marginTop="252dp"
-            android:text="Перевести" />
+            android:text="Перевести"
+            tools:ignore="HardcodedText,RtlHardcoded" />
 
         <TextView
             android:id="@+id/translatedText"
+            android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="7dp"
             android:layout_marginTop="320dp"
-            android:text="TextView" />
+            android:text="TextView"
+            tools:ignore="HardcodedText,RtlHardcoded" />
 
 
     </FrameLayout>
