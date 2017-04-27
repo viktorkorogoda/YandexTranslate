@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -33,8 +32,6 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +45,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private final String defaultLng = "ru";
 
     private RequestQueue mQueue;
+
 
     private boolean parseLng = false;
     private boolean translate = false;
@@ -63,6 +61,9 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private String lngTo = "";
     private HashMap<Integer, HashMap<String, String>> lngCollections;
     private TextView translatedText;
+    private FrameLayout translateFrameLayout;
+    private FrameLayout bookmarkFrameLayout;
+    private FrameLayout settingsFrameLayout;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -72,10 +73,19 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_translate:
+                    settingsFrameLayout.setVisibility(View.INVISIBLE);
+                    bookmarkFrameLayout.setVisibility(View.INVISIBLE);
+                    translateFrameLayout.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_bookmark:
+                    settingsFrameLayout.setVisibility(View.INVISIBLE);
+                    translateFrameLayout.setVisibility(View.INVISIBLE);
+                    bookmarkFrameLayout.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_settings:
+                    settingsFrameLayout.setVisibility(View.VISIBLE);
+                    bookmarkFrameLayout.setVisibility(View.INVISIBLE);
+                    translateFrameLayout.setVisibility(View.INVISIBLE);
                     return true;
             }
             return false;
@@ -94,7 +104,10 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         buttonTranslate = (Button) findViewById(R.id.buttonTranslate);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-//        editText.setOnKeyListener(onKeyListener);
+
+        translateFrameLayout = (FrameLayout) findViewById(R.id.translate);
+        bookmarkFrameLayout = (FrameLayout) findViewById(R.id.bookmark);
+        settingsFrameLayout = (FrameLayout) findViewById(R.id.settings);
         translatedText = (TextView) findViewById(R.id.translatedText);
 
         spinnerLeft.setOnItemSelectedListener(selectLeft);
@@ -102,7 +115,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         buttonTranslate.setOnClickListener(onClickListener);
         buttonSwapLng.setOnClickListener(onClickListenerSwapLng);
         getLanguages(defaultLng);
-        editText.addTextChangedListener(new EditTextWatcher(spinnerLeft,spinnerRight,buttonSwapLng,editText));
+        editText.addTextChangedListener(new EditTextWatcher(spinnerLeft, spinnerRight, buttonSwapLng, editText));
     }
 
     private EditText.OnKeyListener onKeyListener = new EditText.OnKeyListener() {
@@ -225,7 +238,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
         String url = null;
         try {
-            url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + URLEncoder.encode(text,"UTF-8") + "&lang=" + lang + "&key=" + key;
+            url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + URLEncoder.encode(text, "UTF-8") + "&lang=" + lang + "&key=" + key;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

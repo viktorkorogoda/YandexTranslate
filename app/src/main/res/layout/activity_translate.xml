@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context="com.example.viktor.yandextranslate.TranslateActivity">
 
     <FrameLayout
-        android:id="@+id/content"
+        android:id="@+id/translate"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="516dp">
 
         <EditText
             android:id="@+id/editText"
@@ -52,11 +51,11 @@
             android:layout_height="55dp"
             android:layout_marginLeft="152dp"
             android:layout_marginTop="8dp"
+            android:src="@drawable/ic_swap_btn_img"
             android:text="swap"
             android:textSize="12sp"
             android:visibility="invisible"
-            tools:ignore="HardcodedText,RtlHardcoded"
-            android:src="@drawable/ic_swap_btn_img"/>
+            tools:ignore="HardcodedText,RtlHardcoded" />
 
         <Button
             android:id="@+id/buttonTranslate"
@@ -71,20 +70,60 @@
             android:id="@+id/translatedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="320dp"
-            android:textSize="22dp"
+            android:textSize="28dp"
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/bookmark"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/translate"
+        android:layout_weight="2"
+        android:visibility="invisible"
+        tools:ignore="ObsoleteLayoutParam">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="171dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="150dp"
+            android:text="bookmark"
+            android:textSize="24sp"
             tools:ignore="HardcodedText,RtlHardcoded" />
+    </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/settings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/translate"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/navigation"
+        android:layout_weight="3"
+        android:visibility="invisible"
+        tools:ignore="ObsoleteLayoutParam">
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="250dp"
+            android:text="settings"
+            android:textSize="24sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
     </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
         app:menu="@menu/navigation" />
 
-</LinearLayout>
+</RelativeLayout>
