@@ -1,5 +1,6 @@
 package com.example.viktor.yandextranslate.utils;
 
+import android.support.v7.widget.AppCompatImageButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,11 +16,11 @@ public class EditTextWatcher implements TextWatcher {
 
     private Spinner spinnerLeft;
     private Spinner spinnerRight;
-    private Button buttonSwapLng;
+    private AppCompatImageButton buttonSwapLng;
     private EditText editText;
     private boolean visibleSpinner = false;
 
-    public EditTextWatcher(Spinner spinnerLeft, Spinner spinnerRight, Button buttonSwapLng, EditText editText) {
+    public EditTextWatcher(Spinner spinnerLeft, Spinner spinnerRight, AppCompatImageButton buttonSwapLng, EditText editText) {
         this.spinnerLeft = spinnerLeft;
         this.spinnerRight = spinnerRight;
         this.buttonSwapLng = buttonSwapLng;

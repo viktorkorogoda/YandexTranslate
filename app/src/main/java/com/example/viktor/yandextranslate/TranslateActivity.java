@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -31,7 +32,10 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -50,7 +54,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     private Spinner spinnerLeft;
     private Spinner spinnerRight;
-    private Button buttonSwapLng;
+    private AppCompatImageButton buttonSwapLng;
     private Button buttonTranslate;
     public static final String REQUEST_TAG = "TranslateActivity";
 
@@ -86,7 +90,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         editText = (EditText) findViewById(R.id.editText);
         spinnerLeft = (Spinner) findViewById(R.id.spinnerLeft);
         spinnerRight = (Spinner) findViewById(R.id.spinnerRight);
-        buttonSwapLng = (Button) findViewById(R.id.buttonSwapLng);
+        buttonSwapLng = (AppCompatImageButton) findViewById(R.id.buttonSwapLng);
         buttonTranslate = (Button) findViewById(R.id.buttonTranslate);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -126,13 +130,6 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
             return false;
         }
     };
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        String str = "";
-        str = "123123";
-        return super.dispatchKeyEvent(event);
-    }
 
 
     private Button.OnClickListener onClickListener = new Button.OnClickListener() {
@@ -226,7 +223,12 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private void sendToTranslate(String text, String lang) {
         translate = true;
         String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
-        String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + text + "&lang=" + lang + "&key=" + key;
+        String url = null;
+        try {
+            url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + URLEncoder.encode(text,"UTF-8") + "&lang=" + lang + "&key=" + key;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         // Instantiate the RequestQueue.
         mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
@@ -238,6 +240,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 //        } catch (AuthFailureError authFailureError) {
 //            authFailureError.printStackTrace();
 //        }
+
         jsonRequest.setTag(REQUEST_TAG);
         mQueue.add(jsonRequest);
     }
