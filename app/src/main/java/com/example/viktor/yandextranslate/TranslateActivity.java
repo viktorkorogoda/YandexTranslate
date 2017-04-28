@@ -8,12 +8,17 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -35,6 +40,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 
 public class TranslateActivity extends AppCompatActivity implements Response.Listener, Response.ErrorListener {
@@ -64,6 +71,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private FrameLayout translateFrameLayout;
     private FrameLayout bookmarkFrameLayout;
     private FrameLayout settingsFrameLayout;
+    private List<TableRow> rows;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -96,6 +104,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     protected void onCreate(Bundle savedInstanceState) {
         languageDirection = new LanguageDirection();
         super.onCreate(savedInstanceState);
+        rows = new ArrayList<>();
         setContentView(R.layout.activity_translate);
         editText = (EditText) findViewById(R.id.editText);
         spinnerLeft = (Spinner) findViewById(R.id.spinnerLeft);
@@ -108,7 +117,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         translateFrameLayout = (FrameLayout) findViewById(R.id.translate);
         bookmarkFrameLayout = (FrameLayout) findViewById(R.id.bookmark);
         settingsFrameLayout = (FrameLayout) findViewById(R.id.settings);
-        translatedText = (TextView) findViewById(R.id.translatedText);
+//        translatedText = (TextView) findViewById(R.id.translatedText);
 
         spinnerLeft.setOnItemSelectedListener(selectLeft);
         spinnerRight.setOnItemSelectedListener(selectRight);
@@ -300,8 +309,44 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
         Gson gson = new Gson();
         TranslateResponse response = gson.fromJson(text, TranslateResponse.class);
+        addTranslatedTextRow(response);
+//        this.translatedText.setText(response.getText().get(0));
+    }
 
-        this.translatedText.setText(response.getText().get(0));
+
+    private void addTranslatedTextRow(TranslateResponse response) {
+        TableLayout tl = (TableLayout) findViewById(R.id.translateTable);
+        tl.removeAllViews();
+        for (String text : response.getText()) {
+
+            TableRow tr = new TableRow(this);
+            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setLayoutParams(new TableRow.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            ImageView iv = new ImageView(this);
+            iv.setImageResource(R.drawable.ic_add_bookmark);
+            LinearLayout.LayoutParams layoutParamsIV = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParamsIV.setMargins(10, 6, 0, 0);
+            iv.setLayoutParams(layoutParamsIV);
+
+            TextView textView = new TextView(this);
+            textView.setTag(UUID.randomUUID().toString());
+            textView.setText(text);
+            textView.setTextSize(25);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 5f);
+            layoutParams.setMargins(25, 10, 0, 0);
+            textView.setLayoutParams(layoutParams);
+
+
+            linearLayout.addView(textView);
+            linearLayout.addView(iv);
+
+            tr.addView(linearLayout);
+            tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
+        }
     }
 
 
