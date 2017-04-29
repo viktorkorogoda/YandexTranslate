@@ -13,7 +13,16 @@ public class TranslateResponse {
 
     private int code;
     private String lang;
+    private String realText;
     private List<String> text;
+
+    public String getRealText() {
+        return realText;
+    }
+
+    public void setRealText(String realText) {
+        this.realText = realText;
+    }
 
     public UUID getId() {
         return id;
@@ -22,6 +31,7 @@ public class TranslateResponse {
     public void setId(UUID id) {
         this.id = id;
     }
+
     public int getCode() {
         return code;
     }

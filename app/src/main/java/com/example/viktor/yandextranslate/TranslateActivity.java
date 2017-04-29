@@ -5,21 +5,16 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,8 +23,10 @@ import com.android.volley.VolleyError;
 import com.example.viktor.yandextranslate.models.LanguageDirection;
 import com.example.viktor.yandextranslate.models.Languages;
 import com.example.viktor.yandextranslate.models.TranslateResponse;
+import com.example.viktor.yandextranslate.models.TranslatedEntity;
 import com.example.viktor.yandextranslate.nettwork.CustomJSONObjectRequest;
 import com.example.viktor.yandextranslate.nettwork.CustomVolleyRequestQueue;
+import com.example.viktor.yandextranslate.utils.BookmarkUtils;
 import com.example.viktor.yandextranslate.utils.EditTextWatcher;
 import com.example.viktor.yandextranslate.utils.Utils;
 import com.google.gson.Gson;
@@ -40,38 +37,28 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.Set;
+
+import static com.example.viktor.yandextranslate.utils.RowsCreator.addTranslatedTextRow;
 
 
 public class TranslateActivity extends AppCompatActivity implements Response.Listener, Response.ErrorListener {
     private EditText editText;
     private boolean userIsInteracting;
-    private boolean visibleSpinner = false;
-
     private final String defaultLng = "ru";
-
-    private RequestQueue mQueue;
-
-
     private boolean parseLng = false;
     private boolean translate = false;
-
     private Spinner spinnerLeft;
     private Spinner spinnerRight;
-    private AppCompatImageButton buttonSwapLng;
-    private Button buttonTranslate;
-    public static final String REQUEST_TAG = "TranslateActivity";
-
+    private static final String REQUEST_TAG = "TranslateActivity";
     private LanguageDirection languageDirection;
     private String lngFrom = "";
     private String lngTo = "";
     private HashMap<Integer, HashMap<String, String>> lngCollections;
-    private TextView translatedText;
     private FrameLayout translateFrameLayout;
-    private FrameLayout bookmarkFrameLayout;
+    private LinearLayout bookmarkFrameLayout;
     private FrameLayout settingsFrameLayout;
-    private List<TableRow> rows;
+    private Set<TranslatedEntity> bookmarks;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -89,6 +76,8 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
                     settingsFrameLayout.setVisibility(View.INVISIBLE);
                     translateFrameLayout.setVisibility(View.INVISIBLE);
                     bookmarkFrameLayout.setVisibility(View.VISIBLE);
+                    ((LinearLayout) findViewById(R.id.bookmark)).removeAllViews();
+                    BookmarkUtils.fillBookmarks((LinearLayout) findViewById(R.id.bookmark), getApplicationContext(), bookmarks);
                     return true;
                 case R.id.navigation_settings:
                     settingsFrameLayout.setVisibility(View.VISIBLE);
@@ -102,22 +91,21 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        bookmarks = BookmarkUtils.readBookmark(this);
         languageDirection = new LanguageDirection();
         super.onCreate(savedInstanceState);
-        rows = new ArrayList<>();
         setContentView(R.layout.activity_translate);
         editText = (EditText) findViewById(R.id.editText);
         spinnerLeft = (Spinner) findViewById(R.id.spinnerLeft);
         spinnerRight = (Spinner) findViewById(R.id.spinnerRight);
-        buttonSwapLng = (AppCompatImageButton) findViewById(R.id.buttonSwapLng);
-        buttonTranslate = (Button) findViewById(R.id.buttonTranslate);
+        AppCompatImageButton buttonSwapLng = (AppCompatImageButton) findViewById(R.id.buttonSwapLng);
+        Button buttonTranslate = (Button) findViewById(R.id.buttonTranslate);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         translateFrameLayout = (FrameLayout) findViewById(R.id.translate);
-        bookmarkFrameLayout = (FrameLayout) findViewById(R.id.bookmark);
+        bookmarkFrameLayout = (LinearLayout) findViewById(R.id.bookmark);
         settingsFrameLayout = (FrameLayout) findViewById(R.id.settings);
-//        translatedText = (TextView) findViewById(R.id.translatedText);
 
         spinnerLeft.setOnItemSelectedListener(selectLeft);
         spinnerRight.setOnItemSelectedListener(selectRight);
@@ -126,33 +114,6 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         getLanguages(defaultLng);
         editText.addTextChangedListener(new EditTextWatcher(spinnerLeft, spinnerRight, buttonSwapLng, editText));
     }
-
-    private EditText.OnKeyListener onKeyListener = new EditText.OnKeyListener() {
-
-        @Override
-        public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-            if (event.getAction() == KeyEvent.FLAG_SOFT_KEYBOARD) {
-
-                if (editText.getText().length() != 0) {
-                    if (!visibleSpinner) {
-                        spinnerLeft.setVisibility(View.VISIBLE);
-                        spinnerRight.setVisibility(View.VISIBLE);
-                        buttonSwapLng.setVisibility(View.VISIBLE);
-                        visibleSpinner = true;
-                    }
-                } else {
-                    visibleSpinner = false;
-                    spinnerLeft.setVisibility(View.INVISIBLE);
-                    spinnerRight.setVisibility(View.INVISIBLE);
-                    buttonSwapLng.setVisibility(View.INVISIBLE);
-                }
-                return true;
-            }
-            return false;
-        }
-    };
-
 
     private Button.OnClickListener onClickListener = new Button.OnClickListener() {
 
@@ -229,7 +190,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     }
 
 
-    private void addToLangueageCollections(HashMap<String, String> languageNames) {
+    private void addToLanguageCollections(HashMap<String, String> languageNames) {
         if (this.lngCollections == null) {
             this.lngCollections = new HashMap<>();
             int i = 0;
@@ -247,33 +208,33 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
         String url = null;
         try {
-            url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text=" + URLEncoder.encode(text, "UTF-8") + "&lang=" + lang + "&key=" + key;
+            url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text="
+                    + URLEncoder.encode(text, "UTF-8")
+                    + "&lang="
+                    + lang
+                    + "&key="
+                    + key;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        // Instantiate the RequestQueue.
-        mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
-                .getRequestQueue();
-        final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method
-                .GET, url,
-                new JSONObject(), this, this);
-//        try {
-//            jsonRequest.getHeaders().put("Content-type","application/x-www-form-urlencoded");
-//        } catch (AuthFailureError authFailureError) {
-//            authFailureError.printStackTrace();
-//        }
-
-        jsonRequest.setTag(REQUEST_TAG);
-        mQueue.add(jsonRequest);
+        addRequestToQueue(url);
     }
 
 
     private void getLanguages(String lng) {
         this.parseLng = true;
         String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
-        String url = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=" + lng + "&key=" + key;
-        // Instantiate the RequestQueue.
-        mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
+        String url = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="
+                + lng
+                + "&key="
+                + key;
+        addRequestToQueue(url);
+    }
+
+
+    private void addRequestToQueue(String url){
+        //полуение очередеи для http запросо и помещение запроса в очередь
+        RequestQueue mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
         final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method
                 .GET, url,
@@ -287,66 +248,18 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
         Languages languages = gson.fromJson(response, Languages.class);
 
         HashMap<String, String> lanuagesMap = Utils.sortByValue(languages.getLangs());
-        addToLangueageCollections(lanuagesMap);
+        addToLanguageCollections(lanuagesMap);
 
         fillSpinner(spinnerLeft, lanuagesMap);
         fillSpinner(spinnerRight, lanuagesMap);
-        /*else {
-            switch (spinnerName) {
-                case "spinnerRight": {
-                    fillSpinner(spinnerLeft, lanuagesMap);
-                    break;
-                }
-                case "spinnerLeft": {
-                    fillSpinner(spinnerRight, lanuagesMap);
-                    break;
-                }
-            }
-        }*/
     }
 
     private void showTranslatedText(String text) {
-
         Gson gson = new Gson();
         TranslateResponse response = gson.fromJson(text, TranslateResponse.class);
-        addTranslatedTextRow(response);
-//        this.translatedText.setText(response.getText().get(0));
-    }
-
-
-    private void addTranslatedTextRow(TranslateResponse response) {
-        TableLayout tl = (TableLayout) findViewById(R.id.translateTable);
-        tl.removeAllViews();
-        for (String text : response.getText()) {
-
-            TableRow tr = new TableRow(this);
-            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-
-            LinearLayout linearLayout = new LinearLayout(this);
-            linearLayout.setLayoutParams(new TableRow.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-            ImageView iv = new ImageView(this);
-            iv.setImageResource(R.drawable.ic_add_bookmark);
-            LinearLayout.LayoutParams layoutParamsIV = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParamsIV.setMargins(10, 6, 0, 0);
-            iv.setLayoutParams(layoutParamsIV);
-
-            TextView textView = new TextView(this);
-            textView.setTag(UUID.randomUUID().toString());
-            textView.setText(text);
-            textView.setTextSize(25);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 5f);
-            layoutParams.setMargins(25, 10, 0, 0);
-            textView.setLayoutParams(layoutParams);
-
-
-            linearLayout.addView(textView);
-            linearLayout.addView(iv);
-
-            tr.addView(linearLayout);
-            tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
-        }
+        response.setRealText(editText.getText().toString());
+        TableLayout tableLayout = (TableLayout) findViewById(R.id.translateTable);
+        addTranslatedTextRow(tableLayout, this, response, bookmarks);
     }
 
 
