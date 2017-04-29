@@ -12,6 +12,9 @@ import android.widget.Spinner;
  * Created by Viktor on 27.04.2017.
  */
 
+//Обработка событий редактирования текста компонента EditText,
+// для отображеняи кнопок выбора направленяи перевода после начала ввода текста
+
 public class EditTextWatcher implements TextWatcher {
 
     private Spinner spinnerLeft;

@@ -25,6 +25,15 @@ import java.util.UUID;
  */
 
 public class RowsCreator {
+
+    /**
+     * Генерация строки с переведённым тектом
+     *
+     * @param tableLayout layout в который помещается строка
+     * @param context контекст приложения
+     * @param response ответ с переводом
+     * @param bookmarks список закладок
+     */
     public static void addTranslatedTextRow(TableLayout tableLayout, final Context context, final TranslateResponse response, Set<TranslatedEntity> bookmarks) {
         tableLayout.removeAllViews();
 

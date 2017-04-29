@@ -35,7 +35,6 @@ public class CustomVolleyRequestQueue {
             Cache cache = new DiskBasedCache(mCtx.getCacheDir(), 10 * 1024 * 1024);
             Network network = new BasicNetwork(new HurlStack());
             mRequestQueue = new RequestQueue(cache, network);
-            // Don't forget to start the volley request queue
             mRequestQueue.start();
         }
         return mRequestQueue;

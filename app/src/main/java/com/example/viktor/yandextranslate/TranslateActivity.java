@@ -59,6 +59,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
     private LinearLayout bookmarkFrameLayout;
     private FrameLayout settingsFrameLayout;
     private Set<TranslatedEntity> bookmarks;
+    private final String KEY = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -184,7 +185,11 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
 
     private void fillSpinner(Spinner spinner, HashMap<String, String> languageNames) {
-        ArrayAdapter<String> viewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new ArrayList<>(languageNames.values()));
+        ArrayAdapter<String> viewAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                new ArrayList<>(languageNames.values())
+        );
         viewAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(viewAdapter);
     }
@@ -205,7 +210,6 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     private void sendToTranslate(String text, String lang) {
         translate = true;
-        String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
         String url = null;
         try {
             url = "https://translate.yandex.net/api/v1.5/tr.json/translate?text="
@@ -213,7 +217,7 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
                     + "&lang="
                     + lang
                     + "&key="
-                    + key;
+                    + KEY;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -223,22 +227,24 @@ public class TranslateActivity extends AppCompatActivity implements Response.Lis
 
     private void getLanguages(String lng) {
         this.parseLng = true;
-        String key = "trnsl.1.1.20170424T122712Z.30bb3eb21a38e99d.82d54b665ec3a394c5d8c82b49c5457f1be77d60";
         String url = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="
                 + lng
                 + "&key="
-                + key;
+                + KEY;
         addRequestToQueue(url);
     }
 
 
-    private void addRequestToQueue(String url){
-        //полуение очередеи для http запросо и помещение запроса в очередь
-        RequestQueue mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
-                .getRequestQueue();
-        final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method
-                .GET, url,
-                new JSONObject(), this, this);
+    //полуение очередеи для http запросо и помещение запроса в очередь
+    private void addRequestToQueue(String url) {
+        RequestQueue mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext()).getRequestQueue();
+        final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(
+                Request.Method.GET,
+                url,
+                new JSONObject(),
+                this,
+                this
+        );
         jsonRequest.setTag(REQUEST_TAG);
         mQueue.add(jsonRequest);
     }

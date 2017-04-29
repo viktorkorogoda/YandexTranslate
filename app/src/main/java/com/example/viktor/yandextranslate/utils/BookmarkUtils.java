@@ -75,6 +75,14 @@ public class BookmarkUtils {
         }
     }
 
+    /**
+     *
+     * Метод заполнения страницы закладок
+     *
+     * @param frameLayout layout в который добавлется список закладок
+     * @param context контекст прилоения
+     * @param bookmarks список закладок
+     */
     public static void fillBookmarks(LinearLayout frameLayout, Context context, Set<TranslatedEntity> bookmarks) {
 
         for (TranslatedEntity entity : bookmarks) {
